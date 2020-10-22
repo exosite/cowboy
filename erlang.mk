@@ -4437,9 +4437,9 @@ define dep_autopatch_rebar.erl
 		_ ->
 			Write("\npre-app::\n\t$$\(MAKE) -f c_src/Makefile.erlang.mk\n"),
 			PortSpecWrite(io_lib:format("ERL_CFLAGS ?= -finline-functions -Wall -fPIC -I \\"~s/erts-~s/include\\" -I \\"~s\\"\n",
-				[code:root_dir(), erlang:system_info(version), code:lib_dir(erl_interface, include)])),
-			PortSpecWrite(io_lib:format("ERL_LDFLAGS ?= -L \\"~s\\" -lerl_interface -lei\n",
-				[code:lib_dir(erl_interface, lib)])),
+				[code:root_dir(), erlang:system_info(version), code:lib_dir(ei, include)])),
+			PortSpecWrite(io_lib:format("ERL_LDFLAGS ?= -L \\"~s\\" -lei\n",
+				[code:lib_dir(ei, lib)])),
 			[PortSpecWrite(["\n", E, "\n"]) || E <- OsEnv],
 			FilterEnv = fun(Env) ->
 				lists:flatten([case E of
@@ -5273,8 +5273,8 @@ try
 		})
 	end || F <- [$(shell echo $(addprefix $(comma)\",$(addsuffix \",$1)) | sed 's/^.//')]],
 	halt(0)
-catch C:E ->
-	io:format("Exception ~p:~p~nStacktrace: ~p~n", [C, E, erlang:get_stacktrace()]),
+catch C:E:S ->
+	io:format("Exception ~p:~p~nStacktrace: ~p~n", [C, E, S]),
 	halt(1)
 end.
 endef
@@ -5816,7 +5816,7 @@ endif
 CFLAGS += -I"$(ERTS_INCLUDE_DIR)" -I"$(ERL_INTERFACE_INCLUDE_DIR)"
 CXXFLAGS += -I"$(ERTS_INCLUDE_DIR)" -I"$(ERL_INTERFACE_INCLUDE_DIR)"
 
-LDLIBS += -L"$(ERL_INTERFACE_LIB_DIR)" -lerl_interface -lei
+LDLIBS += -L"$(ERL_INTERFACE_LIB_DIR)" -lei
 
 # Verbosity.
 
@@ -5890,8 +5890,8 @@ $(C_SRC_ENV):
 			\"ERL_INTERFACE_INCLUDE_DIR ?= ~s~n\" \
 			\"ERL_INTERFACE_LIB_DIR ?= ~s~n\", \
 			[code:root_dir(), erlang:system_info(version), \
-			code:lib_dir(erl_interface, include), \
-			code:lib_dir(erl_interface, lib)])), \
+			code:lib_dir(ei, include), \
+			code:lib_dir(ei, lib)])), \
 		halt()."
 
 distclean:: distclean-c_src-env
